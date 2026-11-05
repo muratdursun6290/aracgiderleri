@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Araç Giderleri</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#2563eb">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<style>
+:root{--bg:#f4f5f7;--card:#fff;--tx:#1b1f24;--mu:#6b7480;--ac:#2563eb;--acx:#fff;--bd:#e3e6ea;--dg:#d33;--bar:#dbe6fd;
+color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111418;--card:#1b2026;--tx:#eceff3;--mu:#97a1ad;--ac:#5b8cff;--acx:#0b1020;--bd:#2b323a;--dg:#ff6b6b;--bar:#25345a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#111418;--card:#1b2026;--tx:#eceff3;--mu:#97a1ad;--ac:#5b8cff;--acx:#0b1020;--bd:#2b323a;--dg:#ff6b6b;--bar:#25345a;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--tx);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh}
+main{max-width:560px;margin:0 auto;padding:16px 16px 90px}
+h1{font-size:20px;margin:4px 0 14px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:12px}
+label{display:block;font-size:13px;color:var(--mu);margin:10px 0 4px}
+input,select,textarea{width:100%;padding:11px 12px;font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:10px}
+.row{display:flex;gap:10px}.row>div{flex:1;min-width:0}
+button{font:inherit;cursor:pointer}
+.btn{width:100%;margin-top:16px;padding:13px;border:0;border-radius:10px;background:var(--ac);color:var(--acx);font-weight:600}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--card);border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav button{flex:1;padding:14px 0;border:0;background:none;color:var(--mu);font-weight:600}
+nav button.on{color:var(--ac)}
+.hide{display:none}
+.tot{font-size:30px;font-weight:700}
+.sub{color:var(--mu);font-size:14px}
+.cat{margin:10px 0}.cat .t{display:flex;justify-content:space-between;font-size:14px}
+.bar{height:8px;border-radius:4px;background:var(--bar);margin-top:4px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ac)}
+.it{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--bd)}
+.it:first-child{border-top:0}
+.it .m{min-width:0}.it b{display:block}.it small{color:var(--mu);display:block;overflow-wrap:anywhere}
+.it .r{text-align:right;white-space:nowrap}
+.del{background:none;border:0;color:var(--dg);font-size:13px;padding:2px 0}
+.btn.sec{background:var(--bg);color:var(--tx);border:1px solid var(--bd);margin-top:10px}.ed{background:none;border:0;color:var(--ac);font-size:13px;padding:2px 0;margin-right:12px}textarea{min-height:100px;resize:vertical}.fl{margin-top:10px}.toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:10px 16px;border-radius:20px;font-size:14px;opacity:0;transition:.25s;pointer-events:none}
+.toast.on{opacity:1}
+.empty{color:var(--mu);text-align:center;padding:18px 0}
+</style>
+</head>
+<body>
+<main>
+<section id="v1">
+  <h1 id="f-h">🚗 Yeni gider ekle</h1>
+  <div class="card">
+    <div class="row">
+      <div><label for="f-date">Tarih</label><input type="date" id="f-date"></div>
+      <div><label for="f-amt">Tutar (₺)</label><input type="number" id="f-amt" inputmode="decimal" step="0.01" min="0" placeholder="0,00"></div>
+    </div>
+    <label for="f-cat">Kategori</label>
+    <select id="f-cat"></select>
+    <label for="f-km">Kilometre (isteğe bağlı)</label>
+    <input type="number" id="f-km" inputmode="numeric" min="0" placeholder="Örn. 85000">
+    <label for="f-note">Not (isteğe bağlı)</label>
+    <input type="text" id="f-note" maxlength="120" placeholder="Örn. Shell, tam depo">
+    <button class="btn" id="save">Kaydet</button>
+    <button class="btn sec hide" id="cancel">Vazgeç</button>
+  </div>
+</section>
+
+<section id="v2" class="hide">
+  <h1>📊 Özet</h1>
+  <div class="card">
+    <div class="row">
+      <div><label for="q-per">Dönem</label>
+        <select id="q-per">
+          <option value="month">Bu ay</option>
+          <option value="last">Geçen ay</option>
+          <option value="year">Bu yıl</option>
+          <option value="all">Tümü</option>
+          <option value="custom">Özel aralık</option>
+        </select></div>
+      <div><label for="q-cat">Kategori</label><select id="q-cat"></select></div>
+    </div>
+    <div class="row hide" id="q-rng">
+      <div><label for="q-from">Başlangıç</label><input type="date" id="q-from"></div>
+      <div><label for="q-to">Bitiş</label><input type="date" id="q-to"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="sub">Toplam gider</div>
+    <div class="tot" id="s-tot">0 ₺</div>
+    <div class="sub" id="s-sub"></div>
+  </div>
+  <div class="card" id="s-cats"></div>
+  <div class="card" id="s-list"></div>
+</section>
+<section id="v3" class="hide">
+  <h1>💾 Yedek</h1>
+  <div class="card">
+    <b>Yedekle</b>
+    <div class="sub" id="b-cnt"></div>
+    <button class="btn" id="b-dl">Yedek dosyasını indir</button>
+    <button class="btn sec" id="b-cp">Yedeği metin olarak kopyala</button>
+  </div>
+  <div class="card">
+    <b>Geri yükle</b>
+    <div class="sub">Daha önce aldığın yedek dosyasını seç. Kayıtlar mevcutlara eklenir, aynı kayıtlar tekrarlanmaz.</div>
+    <input class="fl" type="file" id="b-file" accept=".json,application/json,text/plain">
+    <label for="b-box">…veya yedek metnini yapıştır</label>
+    <textarea id="b-box" placeholder="Yedek metni"></textarea>
+    <button class="btn sec" id="b-rs">Metinden geri yükle</button>
+  </div>
+  <div class="card">
+    <b>Tüm kayıtları sil</b>
+    <div class="sub">Önce yedek almanı öneririm. Bu işlem geri alınamaz.</div>
+    <button class="btn sec" id="b-del" style="color:var(--dg)">Hepsini sil</button>
+  </div>
+</section>
+</main>
+
+<nav>
+  <button id="t1" class="on">✏️ Veri girişi</button>
+  <button id="t2">📊 Özet</button>
+  <button id="t3">💾 Yedek</button>
+</nav>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+var CATS=["Yakıt","Bakım / Servis","Lastik","Sigorta","Kasko","MTV","Muayene","Otopark / Otoyol","Yıkama","Ceza","Aksesuar","Diğer"];
+var KEY="arac-giderleri-v1";
+var $=function(i){return document.getElementById(i)};
+var data=[],editId=null;
+try{var raw=localStorage.getItem(KEY);if(raw)data=JSON.parse(raw)||[]}catch(e){data=[]}
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){toast("Kayıt cihaza yazılamadı")}}
+function today(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function money(n){return n.toLocaleString("tr-TR",{minimumFractionDigits:2,maximumFractionDigits:2})+" ₺"}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function fdate(s){var p=s.split("-");return p[2]+"."+p[1]+"."+p[0]}
+function toast(m){var t=$("toast");t.textContent=m;t.classList.add("on");setTimeout(function(){t.classList.remove("on")},2200)}
+function newId(){return Date.now()+""+Math.floor(Math.random()*100000)}
+
+$("f-cat").innerHTML=CATS.map(function(c){return"<option>"+c+"</option>"}).join("");
+$("q-cat").innerHTML="<option value=''>Tümü</option>"+CATS.map(function(c){return"<option>"+c+"</option>"}).join("");
+
+function resetForm(){
+  editId=null;
+  $("f-date").value=today();$("f-amt").value="";$("f-km").value="";$("f-note").value="";$("f-cat").selectedIndex=0;
+  $("save").textContent="Kaydet";$("cancel").classList.add("hide");$("f-h").textContent="🚗 Yeni gider ekle";
+}
+resetForm();
+
+function show(n){
+  for(var i=1;i<=3;i++){$("v"+i).classList.toggle("hide",i!==n);$("t"+i).classList.toggle("on",i===n)}
+  if(n===2)render();
+  if(n===3)$("b-cnt").textContent=data.length+" kayıt kayıtlı";
+  window.scrollTo(0,0);
+}
+[1,2,3].forEach(function(i){$("t"+i).onclick=function(){if(i!==1&&editId)resetForm();show(i)}});
+
+$("save").onclick=function(){
+  var amt=parseFloat($("f-amt").value),date=$("f-date").value;
+  if(!date||!(amt>0)){toast("Tarih ve tutar gerekli");return}
+  var rec={date:date,amt:amt,cat:$("f-cat").value,km:$("f-km").value,note:$("f-note").value.trim()};
+  if(editId){
+    var o=data.filter(function(x){return x.id===editId})[0];
+    if(o){o.date=rec.date;o.amt=rec.amt;o.cat=rec.cat;o.km=rec.km;o.note=rec.note}
+    persist();resetForm();toast("Güncellendi ✓");show(2);return;
+  }
+  rec.id=newId();data.push(rec);persist();
+  $("f-amt").value="";$("f-note").value="";
+  toast("Kaydedildi ✓");
+};
+$("cancel").onclick=function(){resetForm();show(2)};
+
+function range(){
+  var p=$("q-per").value,d=new Date(),y=d.getFullYear(),m=d.getMonth();
+  function f(dt){return dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0")+"-"+String(dt.getDate()).padStart(2,"0")}
+  if(p==="month")return[f(new Date(y,m,1)),f(new Date(y,m+1,0))];
+  if(p==="last")return[f(new Date(y,m-1,1)),f(new Date(y,m,0))];
+  if(p==="year")return[y+"-01-01",y+"-12-31"];
+  if(p==="custom")return[$("q-from").value||"0000-01-01",$("q-to").value||"9999-12-31"];
+  return["0000-01-01","9999-12-31"];
+}
+["q-per","q-cat","q-from","q-to"].forEach(function(i){$(i).onchange=function(){
+  $("q-rng").classList.toggle("hide",$("q-per").value!=="custom");render()}});
+
+function render(){
+  var r=range(),c=$("q-cat").value;
+  var list=data.filter(function(x){return x.date>=r[0]&&x.date<=r[1]&&(!c||x.cat===c)})
+    .sort(function(a,b){return a.date<b.date?1:a.date>b.date?-1:(a.id<b.id?1:-1)});
+  var tot=list.reduce(function(s,x){return s+x.amt},0);
+  $("s-tot").textContent=money(tot);
+  $("s-sub").textContent=list.length+" kayıt"+(list.length?" · ortalama "+money(tot/list.length):"");
+  var by={};list.forEach(function(x){by[x.cat]=(by[x.cat]||0)+x.amt});
+  var keys=Object.keys(by).sort(function(a,b){return by[b]-by[a]});
+  $("s-cats").innerHTML=keys.length?"<b>Kategoriye göre</b>"+keys.map(function(k){
+    var pc=tot?by[k]/tot*100:0;
+    return'<div class="cat"><div class="t"><span>'+esc(k)+'</span><span>'+money(by[k])+' · %'+pc.toFixed(0)+'</span></div><div class="bar"><i style="width:'+pc+'%"></i></div></div>'}).join(""):'<div class="empty">Bu filtrede kayıt yok</div>';
+  $("s-list").innerHTML=list.length?"<b>Kayıtlar</b>"+list.map(function(x){
+    var sub=fdate(x.date)+(x.km?" · "+Number(x.km).toLocaleString("tr-TR")+" km":"");
+    return'<div class="it"><div class="m"><b>'+esc(x.cat)+'</b><small>'+sub+'</small>'+(x.note?'<small>'+esc(x.note)+'</small>':'')+'</div><div class="r"><b>'+money(x.amt)+'</b><button class="ed" data-act="ed" data-id="'+esc(x.id)+'">Düzenle</button><button class="del" data-act="del" data-id="'+esc(x.id)+'">Sil</button></div></div>'}).join(""):"";
+}
+$("s-list").onclick=function(e){
+  var t=e.target,id=t.getAttribute&&t.getAttribute("data-id"),act=t.getAttribute&&t.getAttribute("data-act");
+  if(!id)return;
+  if(act==="del"){
+    if(confirm("Bu kayıt silinsin mi?")){data=data.filter(function(x){return x.id!==id});persist();render();toast("Silindi")}
+  }else if(act==="ed"){
+    var x=data.filter(function(k){return k.id===id})[0];if(!x)return;
+    editId=id;
+    $("f-date").value=x.date;$("f-amt").value=x.amt;$("f-cat").value=x.cat;$("f-km").value=x.km||"";$("f-note").value=x.note||"";
+    $("save").textContent="Güncelle";$("cancel").classList.remove("hide");$("f-h").textContent="✏️ Kaydı düzenle";
+    show(1);
+  }
+};
+
+/* Yedekleme */
+function backupText(){return JSON.stringify({app:"arac-giderleri",v:1,exported:new Date().toISOString(),records:data},null,1)}
+function showText(t){var b=$("b-box");b.value=t;b.focus();b.select()}
+$("b-cp").onclick=function(){
+  if(!data.length){toast("Yedeklenecek kayıt yok");return}
+  var t=backupText();showText(t);
+  try{navigator.clipboard.writeText(t).then(function(){toast("Kopyalandı ✓")},function(){toast("Metin aşağıda, elle kopyala")})}catch(e){toast("Metin aşağıda, elle kopyala")}
+};
+$("b-dl").onclick=async function(){
+  if(!data.length){toast("Yedeklenecek kayıt yok");return}
+  var t=backupText();
+  try{
+    var d=window.claude&&await window.claude.use("downloads");
+    if(d){await d.save({filename:"arac-giderleri-"+today()+".json",data:t});toast("Yedek hazır ✓");return}
+  }catch(e){if(e&&e.code==="declined")return}
+  try{
+    var u=URL.createObjectURL(new Blob([t],{type:"application/json"})),a=document.createElement("a");
+    a.href=u;a.download="arac-giderleri-"+today()+".json";document.body.appendChild(a);a.click();a.remove();
+    setTimeout(function(){URL.revokeObjectURL(u)},4000);toast("Yedek indirildi ✓");
+  }catch(e){showText(t);toast("İndirme olmadı; metni kopyalayıp kaydet")}
+};
+function importText(txt){
+  var p;try{p=JSON.parse(txt)}catch(e){toast("Geçersiz yedek");return}
+  var arr=Array.isArray(p)?p:(p&&p.records);
+  if(!Array.isArray(arr)){toast("Geçersiz yedek");return}
+  var ok=[];
+  arr.forEach(function(r){
+    if(!r||!/^\d{4}-\d{2}-\d{2}$/.test(String(r.date))||!(Number(r.amt)>0))return;
+    ok.push({id:String(r.id||newId()),date:String(r.date),amt:Number(r.amt),cat:CATS.indexOf(r.cat)>-1?r.cat:"Diğer",km:r.km?String(r.km):"",note:String(r.note||"").slice(0,120)});
+  });
+  if(!ok.length){toast("Yedekte geçerli kayıt yok");return}
+  var have={};data.forEach(function(x){have[x.id]=1});
+  var add=ok.filter(function(x){return!have[x.id]});
+  if(!add.length){toast("Tüm kayıtlar zaten var");return}
+  if(!confirm(add.length+" yeni kayıt eklenecek ("+(ok.length-add.length)+" tanesi zaten var). Devam edilsin mi?"))return;
+  data=data.concat(add);persist();$("b-cnt").textContent=data.length+" kayıt kayıtlı";$("b-box").value="";
+  toast(add.length+" kayıt geri yüklendi ✓");
+}
+$("b-file").onchange=function(){
+  var f=this.files&&this.files[0];if(!f)return;
+  var rd=new FileReader();
+  rd.onload=function(){importText(String(rd.result))};
+  rd.onerror=function(){toast("Dosya okunamadı")};
+  rd.readAsText(f);this.value="";
+};
+$("b-rs").onclick=function(){var t=$("b-box").value.trim();if(!t){toast("Önce yedek metnini yapıştır");return}importText(t)};
+$("b-del").onclick=function(){
+  if(!data.length){toast("Silinecek kayıt yok");return}
+  if(confirm("Tüm "+data.length+" kayıt kalıcı olarak silinecek. Emin misin?")){data=[];persist();$("b-cnt").textContent="0 kayıt kayıtlı";toast("Hepsi silindi")}
+};
+try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
+try{if("serviceWorker" in navigator&&/^https?:/.test(location.protocol))navigator.serviceWorker.register("sw.js")}catch(e){}
+})();
+</script>
+</body>
+</html>
