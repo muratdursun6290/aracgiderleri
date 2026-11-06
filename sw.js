@@ -1,6 +1,6 @@
 // Çevrimdışı çalışma: dosyalar ilk açılışta önbelleğe alınır.
 // Uygulamayı güncellersen VERSION değerini artır.
-const VERSION = "v1";
+const VERSION = "v2";
 const CACHE = "arac-giderleri-" + VERSION;
 const FILES = ["./", "index.html", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png", "icons/maskable-512.png"];
 
